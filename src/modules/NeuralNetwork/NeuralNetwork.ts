@@ -1,9 +1,18 @@
 import * as tf from '@tensorflow/tfjs';
 
 export interface LayerConfig {
-  units: number;
+  type?: 'dense' | 'dropout' | 'batchNormalization' | 'conv2d' | 'maxPooling2d' | 'flatten';
+  units?: number;
   activation?: string;
   inputShape?: number[];
+  rate?: number; // For dropout
+  filters?: number; // For conv2d
+  kernelSize?: number | number[]; // For conv2d
+  strides?: number | number[]; // For conv2d
+  padding?: 'valid' | 'same'; // For conv2d
+  poolSize?: number | number[]; // For maxPooling2d
+  momentum?: number; // For batch normalization
+  epsilon?: number; // For batch normalization
 }
 
 export interface NetworkConfig {
@@ -38,16 +47,89 @@ export class NeuralNetwork {
     this.model = tf.sequential();
 
     this.config.layers.forEach((layerConfig, index) => {
-      const layerOptions: any = {
-        units: layerConfig.units,
-        activation: layerConfig.activation || 'relu',
-      };
+      const layerType = layerConfig.type || 'dense';
+      let layer: tf.layers.Layer;
 
-      if (index === 0 && layerConfig.inputShape) {
-        layerOptions.inputShape = layerConfig.inputShape;
+      switch (layerType) {
+        case 'dense':
+          const denseOptions: any = {
+            units: layerConfig.units || 1,
+            activation: layerConfig.activation || 'relu',
+          };
+          if (index === 0 && layerConfig.inputShape) {
+            denseOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.dense(denseOptions);
+          break;
+
+        case 'dropout':
+          const dropoutOptions: any = {
+            rate: layerConfig.rate || 0.2,
+          };
+          if (index === 0 && layerConfig.inputShape) {
+            dropoutOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.dropout(dropoutOptions);
+          break;
+
+        case 'batchNormalization':
+          const batchNormOptions: any = {
+            momentum: layerConfig.momentum || 0.99,
+            epsilon: layerConfig.epsilon || 0.001,
+          };
+          if (index === 0 && layerConfig.inputShape) {
+            batchNormOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.batchNormalization(batchNormOptions);
+          break;
+
+        case 'conv2d':
+          const conv2dOptions: any = {
+            filters: layerConfig.filters || 32,
+            kernelSize: layerConfig.kernelSize || 3,
+            strides: layerConfig.strides || 1,
+            padding: layerConfig.padding || 'valid',
+            activation: layerConfig.activation || 'relu',
+          };
+          if (index === 0 && layerConfig.inputShape) {
+            conv2dOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.conv2d(conv2dOptions);
+          break;
+
+        case 'maxPooling2d':
+          const maxPoolingOptions: any = {
+            poolSize: layerConfig.poolSize || 2,
+            strides: layerConfig.strides || 2,
+            padding: layerConfig.padding || 'valid',
+          };
+          if (index === 0 && layerConfig.inputShape) {
+            maxPoolingOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.maxPooling2d(maxPoolingOptions);
+          break;
+
+        case 'flatten':
+          const flattenOptions: any = {};
+          if (index === 0 && layerConfig.inputShape) {
+            flattenOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.flatten(flattenOptions);
+          break;
+
+        default:
+          // Default to dense layer
+          const defaultOptions: any = {
+            units: layerConfig.units || 1,
+            activation: layerConfig.activation || 'relu',
+          };
+          if (index === 0 && layerConfig.inputShape) {
+            defaultOptions.inputShape = layerConfig.inputShape;
+          }
+          layer = tf.layers.dense(defaultOptions);
       }
 
-      this.model!.add(tf.layers.dense(layerOptions));
+      this.model!.add(layer);
     });
 
     const optimizer = this.getOptimizer();

@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../../store/useStore';
 import { LayerConfig } from '../../modules/NeuralNetwork/NeuralNetwork';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { useToast } from '../Toast/ToastProvider';
+import { AdvancedLayerConfig } from './AdvancedLayerConfig';
 
 const activationFunctions = ['relu', 'sigmoid', 'tanh', 'linear', 'softmax'];
 const optimizers = ['adam', 'sgd', 'rmsprop'];
@@ -18,6 +19,7 @@ export const NetworkBuilder: React.FC = () => {
     removeLayer,
   } = useStore();
   const { showToast } = useToast();
+  const [advancedMode, setAdvancedMode] = useState(false);
 
   useEffect(() => {
     setNetwork(networkConfig);
@@ -29,8 +31,13 @@ export const NetworkBuilder: React.FC = () => {
     showToast(`Updated ${field} for layer ${index + 1}`, 'success', 1500);
   };
 
+  const handleAdvancedLayerUpdate = (index: number, updatedLayer: LayerConfig) => {
+    updateLayer(index, updatedLayer);
+  };
+
   const handleAddLayer = () => {
     const newLayer: LayerConfig = {
+      type: advancedMode ? 'dense' : undefined,
       units: 4,
       activation: 'relu',
     };
@@ -120,9 +127,42 @@ export const NetworkBuilder: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">Layers</h3>
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-lg font-semibold text-gray-700">Layers</h3>
+          <button
+            onClick={() => setAdvancedMode(!advancedMode)}
+            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+              advancedMode 
+                ? 'bg-purple-500 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            {advancedMode ? 'Advanced Mode' : 'Simple Mode'}
+          </button>
+        </div>
         <AnimatePresence>
-          {networkConfig.layers.map((layer, index) => (
+          {advancedMode ? (
+            // Advanced mode with AdvancedLayerConfig
+            networkConfig.layers.map((layer, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mb-4"
+              >
+                <AdvancedLayerConfig
+                  layer={layer}
+                  onChange={(updatedLayer) => handleAdvancedLayerUpdate(index, updatedLayer)}
+                  onRemove={() => handleRemoveLayer(index)}
+                  index={index}
+                />
+              </motion.div>
+            ))
+          ) : (
+            // Simple mode with existing layout
+            networkConfig.layers.map((layer, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: -20 }}
@@ -198,7 +238,8 @@ export const NetworkBuilder: React.FC = () => {
                 </div>
               )}
             </motion.div>
-          ))}
+          ))
+          )}
         </AnimatePresence>
         
         <button
