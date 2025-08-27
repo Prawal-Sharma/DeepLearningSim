@@ -13,6 +13,7 @@ import { ConceptCards } from './components/Education/ConceptCards'
 import { ActivationVisualizer } from './components/Education/ActivationVisualizer'
 import { ModelManager } from './components/ModelManager/ModelManager'
 import { DatasetManager } from './components/DatasetManager/DatasetManager'
+import { HyperparameterTuner } from './components/HyperparameterTuner/HyperparameterTuner'
 import { useStore } from './store/useStore'
 
 function App() {
@@ -206,6 +207,34 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <NetworkVisualizer />
               <TrainingCharts />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <HyperparameterTuner />
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-semibold mb-3">Hyperparameter Tips</h3>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start">
+                    <span className="text-blue-500 mr-2">📊</span>
+                    <span><strong>Grid Search:</strong> Exhaustive but thorough - tests all combinations</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">🎲</span>
+                    <span><strong>Random Search:</strong> Faster exploration of hyperparameter space</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">📈</span>
+                    <span><strong>Sensitivity:</strong> See how each parameter affects performance</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-orange-500 mr-2">🤖</span>
+                    <span><strong>Auto-Tune:</strong> Uses proven effective combinations</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-red-500 mr-2">💡</span>
+                    <span><strong>Tip:</strong> Start with Auto-Tune, then refine with Grid Search</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         )}
