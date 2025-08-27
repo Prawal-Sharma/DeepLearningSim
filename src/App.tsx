@@ -1,28 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { NetworkBuilder } from './components/NetworkBuilder/NetworkBuilder'
 import { NetworkVisualizer } from './components/Visualizer/NetworkVisualizer'
 import { TrainingPanel } from './components/ControlPanel/TrainingPanel'
+import { WelcomeModal } from './components/WelcomeModal/WelcomeModal'
+import { ToastProvider } from './components/Toast/ToastProvider'
+import { Tooltip } from './components/Tooltip/Tooltip'
+import { TrainingCharts } from './components/Charts/TrainingCharts'
 
 function App() {
   const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer'>('builder')
+  const [showWelcome, setShowWelcome] = useState(false)
+
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisited')
+    if (!hasVisited) {
+      setShowWelcome(true)
+      localStorage.setItem('hasVisited', 'true')
+    }
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+    <ToastProvider>
+      <div className="min-h-screen bg-gray-50">
+        <WelcomeModal isOpen={showWelcome} onClose={() => setShowWelcome(false)} />
+        
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Deep Learning Simulator
+                </h1>
+                <Tooltip content="Click here to see the welcome guide again">
+                  <button
+                    onClick={() => setShowWelcome(true)}
+                    className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
+                </Tooltip>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Deep Learning Simulator
-              </h1>
-            </div>
-            <nav className="flex space-x-2">
+              <nav className="flex space-x-2">
               <button
                 onClick={() => setActiveView('builder')}
                 className={`px-4 py-2 rounded-md transition-colors ${
@@ -82,9 +108,12 @@ function App() {
         )}
         
         {activeView === 'training' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <TrainingPanel />
-            <NetworkVisualizer />
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TrainingPanel />
+              <NetworkVisualizer />
+            </div>
+            <TrainingCharts />
           </div>
         )}
         
@@ -109,7 +138,8 @@ function App() {
           </div>
         )}
       </main>
-    </div>
+      </div>
+    </ToastProvider>
   )
 }
 

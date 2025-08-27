@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../../store/useStore';
 import { datasets } from '../../modules/Datasets/datasets';
+import { useToast } from '../Toast/ToastProvider';
+import { Tooltip } from '../Tooltip/Tooltip';
 import * as tf from '@tensorflow/tfjs';
 
 export const TrainingPanel: React.FC = () => {
@@ -20,15 +22,17 @@ export const TrainingPanel: React.FC = () => {
   const [epochs, setEpochs] = useState(100);
   const [batchSize, setBatchSize] = useState(32);
   const [learningRate, setLearningRate] = useState(0.01);
+  const { showToast } = useToast();
 
   const handleStartTraining = async () => {
     if (!network) {
-      alert('Please build a network first');
+      showToast('Please build a network first', 'warning');
       return;
     }
 
-    startTraining();
     const dataset = datasets[selectedDataset];
+    startTraining();
+    showToast(`Starting training on ${dataset.name} dataset`, 'info');
 
     try {
       const xTrain = tf.tensor2d(dataset.data.inputs);
@@ -51,8 +55,10 @@ export const TrainingPanel: React.FC = () => {
 
       xTrain.dispose();
       yTrain.dispose();
+      showToast('Training completed successfully!', 'success');
     } catch (error) {
       console.error('Training error:', error);
+      showToast('Training failed. Please check your network configuration.', 'error');
       stopTraining();
     }
   };
