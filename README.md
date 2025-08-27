@@ -1,14 +1,29 @@
 # Deep Learning Simulator
 
-An interactive web-based Deep Learning Simulator that provides intuitive visual insights into neural networks and deep learning concepts.
+An comprehensive educational platform for learning deep learning through interactive visualizations, hands-on tutorials, and real-time experimentation.
 
 ## 🎯 Features
 
-- **Interactive Network Builder**: Design custom neural networks by adding/removing layers and neurons
-- **Real-time Visualization**: See your neural network architecture with D3.js-powered graphics
-- **Live Training**: Watch weights update and data flow through the network during training
-- **Pre-built Datasets**: Train on classic problems like XOR, circles, spirals, and regression tasks
-- **Educational Content**: Learn about forward propagation, backpropagation, activation functions, and more
+### Core Functionality
+- **Interactive Network Builder**: Design custom neural networks with drag-and-drop simplicity
+- **Real-time Visualization**: Watch your network architecture come to life with D3.js graphics
+- **Live Training**: See weights update and data flow through the network in real-time
+- **Dataset Visualization**: Interactive 2D plots showing data points and decision boundaries
+- **Pre-built Datasets**: Train on XOR, circles, spirals, linear, and quadratic problems
+
+### Educational Features 🆕
+- **Interactive Tutorial System**: Step-by-step guided lessons for beginners
+- **Concept Cards**: Comprehensive explanations of deep learning concepts
+- **Activation Function Visualizer**: Interactive graphs showing how different activation functions work
+- **Mathematical Formulas**: See the math behind neural networks
+- **Learning Hub**: Dedicated space for educational content and exploration
+
+### Advanced Controls
+- **Pause/Resume Training**: Stop and continue training at any point
+- **Variable Speed Training**: Control training speed (0.5x to 5x)
+- **Keyboard Shortcuts**: Space (pause/resume), Esc (stop), 1-4 (speed control)
+- **Custom Dataset Creation**: Click to add your own data points
+- **Real-time Metrics**: Live loss and accuracy charts with Recharts
 
 ## 🚀 Getting Started
 
@@ -35,7 +50,7 @@ npm install
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:3000`
+4. Open your browser and navigate to `http://localhost:5173`
 
 ## 🛠️ Tech Stack
 
@@ -49,26 +64,45 @@ npm run dev
 
 ## 📚 How to Use
 
-### Network Builder
-1. Navigate to the "Builder" tab
-2. Add or remove layers using the interface
-3. Adjust neurons per layer
-4. Select activation functions for each layer
-5. Configure optimizer and loss function
+### 1. Network Builder Tab
+- Add or remove layers using the intuitive interface
+- Adjust neurons per layer (1-128)
+- Select activation functions (ReLU, Sigmoid, Tanh, Linear, Softmax)
+- Configure optimizer (Adam, SGD, RMSprop) and loss function
+- Use network presets for quick start
 
-### Training
-1. Switch to the "Training" tab
-2. Select a dataset from the dropdown
-3. Configure training parameters (epochs, batch size, learning rate)
-4. Click "Start Training" and watch the network learn
-5. Monitor loss and accuracy in real-time
+### 2. Training Tab
+- Select from 5 pre-built datasets or create your own
+- Configure training parameters (epochs, batch size, learning rate)
+- Use advanced controls:
+  - ⏸️ Pause/Resume training
+  - 🎚️ Adjust training speed (0.5x - 5x)
+  - ⌨️ Keyboard shortcuts for quick control
+- Watch real-time metrics and visualizations:
+  - Loss and accuracy charts
+  - Dataset visualization with decision boundaries
+  - Network weight updates
 
-### Visualizer
-1. Go to the "Visualizer" tab
-2. See the complete network architecture
-3. Hover over neurons for details
-4. Blue connections represent positive weights
-5. Red connections represent negative weights
+### 3. Visualizer Tab
+- See complete network architecture
+- Interactive neuron information on hover
+- Color-coded connections (blue = positive, red = negative weights)
+- Real-time animation during training
+
+### 4. Learn Tab 🆕
+- **Interactive Tutorials**: Follow step-by-step guides
+  - "Build Your First Neural Network"
+  - "Understanding Backpropagation"
+  - "Activation Functions Explained"
+- **Concept Cards**: Click to explore deep learning concepts
+  - Neurons, weights, biases
+  - Forward/backward propagation
+  - Gradient descent and optimizers
+  - Overfitting and regularization
+- **Activation Function Visualizer**:
+  - Interactive graphs for 6 activation functions
+  - Compare multiple functions side-by-side
+  - See derivatives and understand gradients
 
 ## 🎓 Educational Concepts
 
@@ -92,6 +126,34 @@ This simulator helps you understand:
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 🎮 Keyboard Shortcuts
+
+- **Space**: Pause/Resume training
+- **Esc**: Stop training
+- **1-4**: Set training speed (0.5x, 1x, 2x, 5x)
+
+## 📈 Version History
+
+### v2.0 - Educational Update
+- Added comprehensive Learn tab with tutorials and concept explanations
+- Interactive activation function visualizer
+- Step-by-step tutorial system
+- Concept cards with detailed explanations
+- Mathematical formula displays
+
+### v1.5 - Sprint 1 Complete
+- Enhanced training controls (pause/resume, speed control)
+- Dataset visualization with decision boundaries
+- Real-time training charts
+- Interactive dataset creation
+- Keyboard shortcuts
+
+### v1.0 - Initial Release
+- Basic network builder
+- Training with pre-built datasets
+- Network visualization
+- Welcome modal and onboarding
 
 ## 📄 License
 

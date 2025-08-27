@@ -8,10 +8,13 @@ import { ToastProvider } from './components/Toast/ToastProvider'
 import { Tooltip } from './components/Tooltip/Tooltip'
 import { TrainingCharts } from './components/Charts/TrainingCharts'
 import { EnhancedTrainingControls } from './components/ControlPanel/EnhancedTrainingControls'
+import { TutorialSystem } from './components/Tutorial/TutorialSystem'
+import { ConceptCards } from './components/Education/ConceptCards'
+import { ActivationVisualizer } from './components/Education/ActivationVisualizer'
 import { useStore } from './store/useStore'
 
 function App() {
-  const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer'>('builder')
+  const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer' | 'learn'>('builder')
   const [showWelcome, setShowWelcome] = useState(false)
   const { isTraining, isPaused, pauseTraining, resumeTraining, stopTraining, setTrainingSpeed } = useStore()
 
@@ -132,6 +135,21 @@ function App() {
                   <span>Visualizer</span>
                 </div>
               </button>
+              <button
+                onClick={() => setActiveView('learn')}
+                className={`px-4 py-2 rounded-md transition-colors ${
+                  activeView === 'learn'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span>Learn</span>
+                </div>
+              </button>
             </nav>
           </div>
         </div>
@@ -180,7 +198,50 @@ function App() {
             </div>
           </div>
         )}
+
+        {activeView === 'learn' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white p-6 rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold mb-2">Learn Deep Learning</h2>
+              <p className="text-lg opacity-90">
+                Explore interactive tutorials, understand key concepts, and visualize how neural networks work
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ConceptCards />
+              <ActivationVisualizer />
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">Quick Tips</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2">Start Small</h4>
+                  <p className="text-sm text-blue-700">
+                    Begin with simple networks (2-3 layers) and gradually increase complexity
+                  </p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-green-900 mb-2">Experiment</h4>
+                  <p className="text-sm text-green-700">
+                    Try different activation functions and see how they affect learning
+                  </p>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-purple-900 mb-2">Observe Patterns</h4>
+                  <p className="text-sm text-purple-700">
+                    Watch how loss decreases and accuracy improves during training
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
+      
+      {/* Tutorial System Overlay */}
+      <TutorialSystem />
       </div>
     </ToastProvider>
   )
