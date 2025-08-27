@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../../store/useStore';
 import { LayerConfig } from '../../modules/NeuralNetwork/NeuralNetwork';
+import { Tooltip } from '../Tooltip/Tooltip';
+import { useToast } from '../Toast/ToastProvider';
 
 const activationFunctions = ['relu', 'sigmoid', 'tanh', 'linear', 'softmax'];
 const optimizers = ['adam', 'sgd', 'rmsprop'];
@@ -15,6 +17,7 @@ export const NetworkBuilder: React.FC = () => {
     addLayer,
     removeLayer,
   } = useStore();
+  const { showToast } = useToast();
 
   useEffect(() => {
     setNetwork(networkConfig);
@@ -23,6 +26,7 @@ export const NetworkBuilder: React.FC = () => {
   const handleLayerUpdate = (index: number, field: keyof LayerConfig, value: any) => {
     const updatedLayer = { ...networkConfig.layers[index], [field]: value };
     updateLayer(index, updatedLayer);
+    showToast(`Updated ${field} for layer ${index + 1}`, 'success', 1500);
   };
 
   const handleAddLayer = () => {
@@ -31,11 +35,15 @@ export const NetworkBuilder: React.FC = () => {
       activation: 'relu',
     };
     addLayer(newLayer);
+    showToast('New layer added!', 'success');
   };
 
   const handleRemoveLayer = (index: number) => {
     if (networkConfig.layers.length > 1) {
       removeLayer(index);
+      showToast('Layer removed', 'info');
+    } else {
+      showToast('Cannot remove the last layer', 'warning');
     }
   };
 
@@ -49,12 +57,21 @@ export const NetworkBuilder: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Network Architecture</h2>
       
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">Global Settings</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-700 flex items-center">
+          Global Settings
+          <Tooltip content="These settings apply to the entire network during training">
+            <svg className="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </Tooltip>
+        </h3>
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Optimizer
-            </label>
+            <Tooltip content="Algorithm used to update network weights">
+              <label className="block text-sm font-medium text-gray-600 mb-1 cursor-help">
+                Optimizer
+              </label>
+            </Tooltip>
             <select
               value={networkConfig.optimizer || 'adam'}
               onChange={(e) => handleConfigUpdate('optimizer', e.target.value)}

@@ -5,18 +5,23 @@ interface NetworkState {
   network: NeuralNetwork | null;
   networkConfig: NetworkConfig;
   isTraining: boolean;
+  isPaused: boolean;
   trainingHistory: any[];
   currentEpoch: number;
   totalEpochs: number;
   loss: number;
   accuracy: number;
+  trainingSpeed: number;
   
   setNetwork: (config: NetworkConfig) => void;
   updateLayer: (index: number, layer: LayerConfig) => void;
   addLayer: (layer: LayerConfig) => void;
   removeLayer: (index: number) => void;
   startTraining: () => void;
+  pauseTraining: () => void;
+  resumeTraining: () => void;
   stopTraining: () => void;
+  setTrainingSpeed: (speed: number) => void;
   updateTrainingMetrics: (metrics: { epoch?: number; loss?: number; accuracy?: number }) => void;
   resetNetwork: () => void;
 }
@@ -36,11 +41,13 @@ export const useStore = create<NetworkState>((set, get) => ({
   network: null,
   networkConfig: defaultNetworkConfig,
   isTraining: false,
+  isPaused: false,
   trainingHistory: [],
   currentEpoch: 0,
   totalEpochs: 0,
   loss: 0,
   accuracy: 0,
+  trainingSpeed: 1,
 
   setNetwork: (config) => {
     const network = new NeuralNetwork(config);
@@ -73,7 +80,19 @@ export const useStore = create<NetworkState>((set, get) => ({
   },
 
   startTraining: () => {
-    set({ isTraining: true, currentEpoch: 0 });
+    set({ isTraining: true, isPaused: false, currentEpoch: 0 });
+  },
+
+  pauseTraining: () => {
+    const { network } = get();
+    if (network) {
+      network.stopTraining();
+    }
+    set({ isPaused: true });
+  },
+
+  resumeTraining: () => {
+    set({ isPaused: false });
   },
 
   stopTraining: () => {
@@ -81,7 +100,11 @@ export const useStore = create<NetworkState>((set, get) => ({
     if (network) {
       network.stopTraining();
     }
-    set({ isTraining: false });
+    set({ isTraining: false, isPaused: false });
+  },
+
+  setTrainingSpeed: (speed) => {
+    set({ trainingSpeed: speed });
   },
 
   updateTrainingMetrics: (metrics) => {

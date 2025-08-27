@@ -4,6 +4,7 @@ import { useStore } from '../../store/useStore';
 import { datasets } from '../../modules/Datasets/datasets';
 import { useToast } from '../Toast/ToastProvider';
 import { Tooltip } from '../Tooltip/Tooltip';
+import { DatasetVisualizer } from '../DatasetVisualizer/DatasetVisualizer';
 import * as tf from '@tensorflow/tfjs';
 
 export const TrainingPanel: React.FC = () => {
@@ -68,8 +69,9 @@ export const TrainingPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Training Control Panel</h2>
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Training Control Panel</h2>
 
       <div className="space-y-4">
         <div>
@@ -196,6 +198,15 @@ export const TrainingPanel: React.FC = () => {
           </motion.div>
         )}
       </div>
+      </div>
+      
+      {/* Dataset Visualization */}
+      {datasets[selectedDataset].type === 'classification' && (
+        <DatasetVisualizer 
+          datasetIndex={selectedDataset} 
+          showDecisionBoundary={!isTraining && currentEpoch > 0}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import { NetworkBuilder } from './components/NetworkBuilder/NetworkBuilder'
 import { NetworkVisualizer } from './components/Visualizer/NetworkVisualizer'
@@ -7,10 +7,13 @@ import { WelcomeModal } from './components/WelcomeModal/WelcomeModal'
 import { ToastProvider } from './components/Toast/ToastProvider'
 import { Tooltip } from './components/Tooltip/Tooltip'
 import { TrainingCharts } from './components/Charts/TrainingCharts'
+import { EnhancedTrainingControls } from './components/ControlPanel/EnhancedTrainingControls'
+import { useStore } from './store/useStore'
 
 function App() {
   const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer'>('builder')
   const [showWelcome, setShowWelcome] = useState(false)
+  const { isTraining, isPaused, pauseTraining, resumeTraining, stopTraining, setTrainingSpeed } = useStore()
 
   useEffect(() => {
     const hasVisited = localStorage.getItem('hasVisited')
@@ -19,6 +22,41 @@ function App() {
       localStorage.setItem('hasVisited', 'true')
     }
   }, [])
+
+  // Keyboard shortcuts
+  const handleKeyPress = useCallback((e: KeyboardEvent) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+    switch (e.key) {
+      case ' ':
+        e.preventDefault()
+        if (isTraining) {
+          if (isPaused) resumeTraining()
+          else pauseTraining()
+        }
+        break
+      case 'Escape':
+        if (isTraining) stopTraining()
+        break
+      case '1':
+        setTrainingSpeed(0.5)
+        break
+      case '2':
+        setTrainingSpeed(1)
+        break
+      case '3':
+        setTrainingSpeed(2)
+        break
+      case '4':
+        setTrainingSpeed(5)
+        break
+    }
+  }, [isTraining, isPaused, pauseTraining, resumeTraining, stopTraining, setTrainingSpeed])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [handleKeyPress])
 
   return (
     <ToastProvider>
@@ -109,11 +147,16 @@ function App() {
         
         {activeView === 'training' && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TrainingPanel />
-              <NetworkVisualizer />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <TrainingPanel />
+              </div>
+              <EnhancedTrainingControls />
             </div>
-            <TrainingCharts />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <NetworkVisualizer />
+              <TrainingCharts />
+            </div>
           </div>
         )}
         
