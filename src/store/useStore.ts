@@ -4,6 +4,7 @@ import { NeuralNetwork, NetworkConfig, LayerConfig } from '../modules/NeuralNetw
 interface NetworkState {
   network: NeuralNetwork | null;
   networkConfig: NetworkConfig;
+  layers: LayerConfig[];
   isTraining: boolean;
   isPaused: boolean;
   trainingHistory: any[];
@@ -12,8 +13,14 @@ interface NetworkState {
   loss: number;
   accuracy: number;
   trainingSpeed: number;
+  trainingMetrics: {
+    loss: number[];
+    accuracy: number[];
+    epoch: number;
+  };
   
   setNetwork: (config: NetworkConfig) => void;
+  loadNetwork: (network: any, layers: LayerConfig[]) => void;
   updateLayer: (index: number, layer: LayerConfig) => void;
   addLayer: (layer: LayerConfig) => void;
   removeLayer: (index: number) => void;
@@ -40,6 +47,7 @@ const defaultNetworkConfig: NetworkConfig = {
 export const useStore = create<NetworkState>((set, get) => ({
   network: null,
   networkConfig: defaultNetworkConfig,
+  layers: defaultNetworkConfig.layers,
   isTraining: false,
   isPaused: false,
   trainingHistory: [],
@@ -48,10 +56,28 @@ export const useStore = create<NetworkState>((set, get) => ({
   loss: 0,
   accuracy: 0,
   trainingSpeed: 1,
+  trainingMetrics: {
+    loss: [],
+    accuracy: [],
+    epoch: 0,
+  },
 
   setNetwork: (config) => {
     const network = new NeuralNetwork(config);
-    set({ network, networkConfig: config });
+    set({ network, networkConfig: config, layers: config.layers });
+  },
+
+  loadNetwork: (network, layers) => {
+    set({ 
+      network: { 
+        model: network.model, 
+        config: network.config,
+        stopTraining: () => {},
+        dispose: () => network.model.dispose()
+      } as any,
+      layers,
+      networkConfig: { ...defaultNetworkConfig, layers }
+    });
   },
 
   updateLayer: (index, layer) => {
@@ -60,7 +86,7 @@ export const useStore = create<NetworkState>((set, get) => ({
     newLayers[index] = layer;
     const newConfig = { ...networkConfig, layers: newLayers };
     const network = new NeuralNetwork(newConfig);
-    set({ network, networkConfig: newConfig });
+    set({ network, networkConfig: newConfig, layers: newLayers });
   },
 
   addLayer: (layer) => {
@@ -68,7 +94,7 @@ export const useStore = create<NetworkState>((set, get) => ({
     const newLayers = [...networkConfig.layers, layer];
     const newConfig = { ...networkConfig, layers: newLayers };
     const network = new NeuralNetwork(newConfig);
-    set({ network, networkConfig: newConfig });
+    set({ network, networkConfig: newConfig, layers: newLayers });
   },
 
   removeLayer: (index) => {
@@ -76,7 +102,7 @@ export const useStore = create<NetworkState>((set, get) => ({
     const newLayers = networkConfig.layers.filter((_, i) => i !== index);
     const newConfig = { ...networkConfig, layers: newLayers };
     const network = new NeuralNetwork(newConfig);
-    set({ network, networkConfig: newConfig });
+    set({ network, networkConfig: newConfig, layers: newLayers });
   },
 
   startTraining: () => {
@@ -113,6 +139,15 @@ export const useStore = create<NetworkState>((set, get) => ({
       currentEpoch: metrics.epoch ?? state.currentEpoch,
       loss: metrics.loss ?? state.loss,
       accuracy: metrics.accuracy ?? state.accuracy,
+      trainingMetrics: {
+        loss: metrics.loss !== undefined 
+          ? [...state.trainingMetrics.loss, metrics.loss] 
+          : state.trainingMetrics.loss,
+        accuracy: metrics.accuracy !== undefined 
+          ? [...state.trainingMetrics.accuracy, metrics.accuracy] 
+          : state.trainingMetrics.accuracy,
+        epoch: metrics.epoch ?? state.trainingMetrics.epoch,
+      },
     }));
   },
 

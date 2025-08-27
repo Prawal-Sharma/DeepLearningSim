@@ -11,10 +11,11 @@ import { EnhancedTrainingControls } from './components/ControlPanel/EnhancedTrai
 import { TutorialSystem } from './components/Tutorial/TutorialSystem'
 import { ConceptCards } from './components/Education/ConceptCards'
 import { ActivationVisualizer } from './components/Education/ActivationVisualizer'
+import { ModelManager } from './components/ModelManager/ModelManager'
 import { useStore } from './store/useStore'
 
 function App() {
-  const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer' | 'learn'>('builder')
+  const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer' | 'learn' | 'models'>('builder')
   const [showWelcome, setShowWelcome] = useState(false)
   const { isTraining, isPaused, pauseTraining, resumeTraining, stopTraining, setTrainingSpeed } = useStore()
 
@@ -150,6 +151,21 @@ function App() {
                   <span>Learn</span>
                 </div>
               </button>
+              <button
+                onClick={() => setActiveView('models')}
+                className={`px-4 py-2 rounded-md transition-colors ${
+                  activeView === 'models'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  <span>Models</span>
+                </div>
+              </button>
             </nav>
           </div>
         </div>
@@ -233,6 +249,38 @@ function App() {
                   <p className="text-sm text-purple-700">
                     Watch how loss decreases and accuracy improves during training
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeView === 'models' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ModelManager />
+              <div className="space-y-4">
+                <NetworkVisualizer />
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h3 className="text-xl font-semibold mb-3">Model Management Guide</h3>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start">
+                      <span className="text-blue-500 mr-2">•</span>
+                      <span><strong>Save Models:</strong> Store your trained models in browser storage for later use</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      <span><strong>Export Models:</strong> Download models as JSON or TensorFlow.js format</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-500 mr-2">•</span>
+                      <span><strong>Compare Models:</strong> Select up to 3 models to compare their performance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-orange-500 mr-2">•</span>
+                      <span><strong>Load Models:</strong> Restore saved models to continue training or testing</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
