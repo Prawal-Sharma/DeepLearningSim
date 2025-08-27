@@ -1,0 +1,39 @@
+{
+  "name": "deeplearningsim",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "deep-learning",
+    "neural-network",
+    "visualization",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "description": "Interactive Deep Learning Simulator for educational purposes",
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.8",
+    "@vitejs/plugin-react": "^3.1.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.2",
+    "vite": "^4.5.14"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "@types/d3": "^7.4.3",
+    "d3": "^7.9.0",
+    "framer-motion": "^12.23.12",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "zustand": "^5.0.8"
+  }
+}
