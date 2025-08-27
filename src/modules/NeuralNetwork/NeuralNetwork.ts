@@ -20,6 +20,7 @@ export interface NetworkConfig {
   optimizer?: string;
   loss?: string;
   learningRate?: number;
+  batchSize?: number;
 }
 
 export interface TrainingOptions {
@@ -33,8 +34,8 @@ export interface TrainingOptions {
 }
 
 export class NeuralNetwork {
-  private model: tf.Sequential | null = null;
-  private config: NetworkConfig;
+  public model: tf.Sequential | null = null;
+  public config: NetworkConfig;
   private trainingHistory: any[] = [];
   private isTraining: boolean = false;
 

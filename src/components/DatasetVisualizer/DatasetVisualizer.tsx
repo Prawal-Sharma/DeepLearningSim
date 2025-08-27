@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { datasets } from '../../modules/Datasets/datasets';
 import { useStore } from '../../store/useStore';
 import * as tf from '@tensorflow/tfjs';
-import { Tooltip } from '../Tooltip/Tooltip';
 
 interface DatasetVisualizerProps {
   datasetIndex: number;
@@ -235,7 +234,7 @@ export const DatasetVisualizer: React.FC<DatasetVisualizerProps> = ({
       .attr('r', 0)
       .transition()
       .duration(500)
-      .delay((d, i) => i * 5)
+      .delay((_, i) => i * 5)
       .attr('r', 5);
 
   }, [dataset, showDecisionBoundary, network, isTraining, customData]);

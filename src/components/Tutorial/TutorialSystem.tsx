@@ -227,7 +227,7 @@ export const TutorialSystem: React.FC = () => {
   const [activeTutorial, setActiveTutorial] = useState<TutorialDefinition | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedTutorials, setCompletedTutorials] = useState<string[]>([]);
-  const [highlightedElement, setHighlightedElement] = useState<HTMLElement | null>(null);
+  const [, setHighlightedElement] = useState<HTMLElement | null>(null);
   const { showToast } = useToast();
 
   const currentStep = activeTutorial?.steps[currentStepIndex];
@@ -453,7 +453,7 @@ export const TutorialSystem: React.FC = () => {
       </AnimatePresence>
 
       {/* Add CSS for highlighting */}
-      <style jsx global>{`
+      <style>{`
         .tutorial-highlight {
           position: relative;
           z-index: 51;

@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useStore } from '../../store/useStore';
 import { datasets } from '../../modules/Datasets/datasets';
 import { useToast } from '../Toast/ToastProvider';
-import { Tooltip } from '../Tooltip/Tooltip';
 import { DatasetVisualizer } from '../DatasetVisualizer/DatasetVisualizer';
 import * as tf from '@tensorflow/tfjs';
 

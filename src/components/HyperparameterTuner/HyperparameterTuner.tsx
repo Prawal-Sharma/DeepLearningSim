@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import * as d3 from 'd3';
 import { useStore } from '../../store/useStore';
 import { useToast } from '../Toast/ToastProvider';
-import { Tooltip } from '../Tooltip/Tooltip';
 
 interface HyperparameterRange {
   learningRate: { min: number; max: number; step: number };
@@ -41,7 +40,7 @@ export const HyperparameterTuner: React.FC = () => {
   const [currentExperiment, setCurrentExperiment] = useState<string>('');
   const sensitivityChartRef = useRef<SVGSVGElement>(null);
   
-  const { network, setNetwork } = useStore();
+  const { setNetwork } = useStore();
   const { showToast } = useToast();
 
   // Default hyperparameter ranges
@@ -275,7 +274,7 @@ export const HyperparameterTuner: React.FC = () => {
       Object.entries(parameterGroups).forEach(([param, data]) => {
         if (data.length > 0) {
           const line = d3.line<TuningResult>()
-            .x((d, i) => xScale(i / (data.length - 1)))
+            .x((_, i) => xScale(i / (data.length - 1)))
             .y(d => yScale(d.score));
 
           g.append('path')
@@ -325,7 +324,7 @@ export const HyperparameterTuner: React.FC = () => {
     }));
 
     // Add dropout layers if specified
-    if (bestResult.params.dropout > 0) {
+    if (bestResult.params.dropout && bestResult.params.dropout > 0) {
       const layersWithDropout: any[] = [];
       layers.forEach((layer, index) => {
         layersWithDropout.push(layer);
@@ -592,7 +591,7 @@ export const HyperparameterTuner: React.FC = () => {
                     <p>Batch Size: {bestResult.params.batchSize}</p>
                     <p>Epochs: {bestResult.params.epochs}</p>
                     <p>Architecture: {bestResult.params.neurons.join(' → ')} neurons</p>
-                    {bestResult.params.dropout > 0 && <p>Dropout: {bestResult.params.dropout.toFixed(2)}</p>}
+                    {bestResult.params.dropout && bestResult.params.dropout > 0 && <p>Dropout: {bestResult.params.dropout.toFixed(2)}</p>}
                   </div>
                 </div>
                 <div className="text-right">

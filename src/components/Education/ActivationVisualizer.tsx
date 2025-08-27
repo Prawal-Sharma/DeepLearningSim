@@ -57,7 +57,7 @@ const activationFunctions: ActivationFunction[] = [
     formula: 'f(x) = x',
     description: 'No activation. Used in output layer for regression tasks.',
     function: (x: number) => x,
-    derivative: (x: number) => 1,
+    derivative: () => 1,
     color: '#EF4444',
     range: { min: -2, max: 2 },
   },

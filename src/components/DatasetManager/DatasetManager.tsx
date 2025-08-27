@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import * as d3 from 'd3';
 import { useToast } from '../Toast/ToastProvider';
-import { Tooltip } from '../Tooltip/Tooltip';
 
 interface DataPoint {
   x: number;
@@ -47,7 +46,8 @@ export const DatasetManager: React.FC<DatasetManagerProps> = ({ onDatasetSelect 
     try {
       const text = await file.text();
       const lines = text.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
+      // Skip headers line - we know the format is x,y,label
+      lines[0].split(',').map(h => h.trim());
       
       const data: DataPoint[] = [];
       for (let i = 1; i < lines.length; i++) {

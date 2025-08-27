@@ -43,7 +43,9 @@ export const ModelManager: React.FC = () => {
 
     try {
       // Save the model weights to IndexedDB
-      await network.model.save(`indexeddb://${modelName}`);
+      if (network.model) {
+        await network.model.save(`indexeddb://${modelName}`);
+      }
 
       const newModel: SavedModel = {
         id: Date.now().toString(),
@@ -126,6 +128,10 @@ export const ModelManager: React.FC = () => {
     try {
       if (format === 'json') {
         // Export as JSON (weights only)
+        if (!network.model) {
+          showToast('No model to export', 'warning');
+          return;
+        }
         const weights = network.model.getWeights();
         const weightsData = await Promise.all(
           weights.map(async w => ({
@@ -154,7 +160,9 @@ export const ModelManager: React.FC = () => {
         showToast('Model exported as JSON', 'success');
       } else {
         // Export as TensorFlow.js format
-        await network.model.save('downloads://my-model');
+        if (network.model) {
+          await network.model.save('downloads://my-model');
+        }
         showToast('Model exported in TensorFlow.js format', 'success');
       }
     } catch (error) {

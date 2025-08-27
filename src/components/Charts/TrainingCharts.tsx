@@ -23,7 +23,7 @@ interface ChartData {
 }
 
 export const TrainingCharts: React.FC = () => {
-  const { trainingHistory, currentEpoch, loss, accuracy, isTraining } = useStore();
+  const { currentEpoch, loss, accuracy, isTraining } = useStore();
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [selectedMetric, setSelectedMetric] = useState<'both' | 'loss' | 'accuracy'>('both');
 

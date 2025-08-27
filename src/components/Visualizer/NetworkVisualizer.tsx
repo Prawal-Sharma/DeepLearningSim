@@ -21,9 +21,7 @@ interface Connection {
 
 export const NetworkVisualizer: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const { networkConfig, network, isTraining } = useStore();
-  const [neurons, setNeurons] = useState<Neuron[]>([]);
-  const [connections, setConnections] = useState<Connection[]>([]);
+  const { networkConfig, isTraining } = useStore();
   const [hoveredNeuron, setHoveredNeuron] = useState<Neuron | null>(null);
 
   useEffect(() => {
@@ -44,7 +42,7 @@ export const NetworkVisualizer: React.FC = () => {
     const newConnections: Connection[] = [];
 
     networkConfig.layers.forEach((layer, layerIndex) => {
-      const neuronCount = layer.units;
+      const neuronCount = layer.units || 1;
       const neuronSpacing = (height - margin.top - margin.bottom) / (neuronCount + 1);
 
       for (let i = 0; i < neuronCount; i++) {
@@ -75,8 +73,6 @@ export const NetworkVisualizer: React.FC = () => {
       });
     }
 
-    setNeurons(newNeurons);
-    setConnections(newConnections);
 
     const g = svg.append('g');
 
@@ -109,7 +105,7 @@ export const NetworkVisualizer: React.FC = () => {
       .attr('stroke-width', d => Math.abs(d.weight) * 2)
       .attr('stroke-opacity', 0.3);
 
-    const neuronCircles = neuronGroup
+    neuronGroup
       .selectAll('circle')
       .data(newNeurons)
       .enter()
@@ -137,7 +133,7 @@ export const NetworkVisualizer: React.FC = () => {
           .attr('fill', '#1E40AF');
       });
 
-    networkConfig.layers.forEach((layer, layerIndex) => {
+    networkConfig.layers.forEach((_, layerIndex) => {
       const x = margin.left + layerIndex * layerSpacing;
       labelGroup
         .append('text')
