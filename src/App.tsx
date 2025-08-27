@@ -12,10 +12,11 @@ import { TutorialSystem } from './components/Tutorial/TutorialSystem'
 import { ConceptCards } from './components/Education/ConceptCards'
 import { ActivationVisualizer } from './components/Education/ActivationVisualizer'
 import { ModelManager } from './components/ModelManager/ModelManager'
+import { DatasetManager } from './components/DatasetManager/DatasetManager'
 import { useStore } from './store/useStore'
 
 function App() {
-  const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer' | 'learn' | 'models'>('builder')
+  const [activeView, setActiveView] = useState<'builder' | 'training' | 'visualizer' | 'learn' | 'models' | 'data'>('builder')
   const [showWelcome, setShowWelcome] = useState(false)
   const { isTraining, isPaused, pauseTraining, resumeTraining, stopTraining, setTrainingSpeed } = useStore()
 
@@ -166,6 +167,21 @@ function App() {
                   <span>Models</span>
                 </div>
               </button>
+              <button
+                onClick={() => setActiveView('data')}
+                className={`px-4 py-2 rounded-md transition-colors ${
+                  activeView === 'data'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Data</span>
+                </div>
+              </button>
             </nav>
           </div>
         </div>
@@ -279,6 +295,48 @@ function App() {
                     <li className="flex items-start">
                       <span className="text-orange-500 mr-2">•</span>
                       <span><strong>Load Models:</strong> Restore saved models to continue training or testing</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeView === 'data' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white p-6 rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold mb-2">Dataset Management</h2>
+              <p className="text-lg opacity-90">
+                Upload CSV data, draw custom datasets, or generate synthetic patterns for training
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <DatasetManager onDatasetSelect={(dataset) => {
+                console.log('Dataset selected:', dataset);
+                // TODO: Update store with selected dataset
+              }} />
+              <div className="space-y-4">
+                <NetworkVisualizer />
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h3 className="text-xl font-semibold mb-3">Data Tips</h3>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start">
+                      <span className="text-indigo-500 mr-2">📊</span>
+                      <span><strong>CSV Upload:</strong> Import your existing datasets in CSV format</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-cyan-500 mr-2">🎨</span>
+                      <span><strong>Draw Mode:</strong> Click to add points for different classes</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-purple-500 mr-2">🔧</span>
+                      <span><strong>Preprocessing:</strong> Normalize and augment your data</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-pink-500 mr-2">🧬</span>
+                      <span><strong>Synthetic Data:</strong> Generate spiral, cluster, or moon patterns</span>
                     </li>
                   </ul>
                 </div>
