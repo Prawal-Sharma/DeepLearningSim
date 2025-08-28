@@ -91,6 +91,7 @@ A neural network is a computational model inspired by the human brain. It consis
    - Click to add points in bottom-left area
    - Switch to Class 1 (red)
    - Click to add points in top-right area
+   - Click "Use for Training" to load dataset
 
 2. **Build a Classifier Network**
    - Go to Builder tab
@@ -132,9 +133,9 @@ A neural network is a computational model inspired by the human brain. It consis
 
 ## Advanced Features
 
-### Hyperparameter Optimization
+### Hyperparameter Optimization (Now with Real Training!)
 
-The Hyperparameter Tuner helps find optimal training parameters:
+The Hyperparameter Tuner now performs actual model training to find optimal parameters:
 
 #### Grid Search
 - Systematically tests all combinations
@@ -158,6 +159,8 @@ The Hyperparameter Tuner helps find optimal training parameters:
 - Uses proven parameter combinations
 - Quick optimization for common problems
 - One-click application
+
+**Important**: You can now stop long-running searches using the Stop button!
 
 ### Building CNNs (Convolutional Neural Networks)
 
@@ -195,21 +198,33 @@ For image-like data, use convolutional layers:
    - Training performance
    - Final accuracy/loss
 
-### Custom Dataset Upload
+### Custom Dataset Integration (New!)
 
-#### CSV Format Requirements
-```csv
-feature1,feature2,label
-0.5,1.2,0
-0.7,0.8,1
-...
-```
+#### How to Use Custom Datasets
 
-#### Preprocessing Options
-- **Normalization**: Scale features to [0,1]
-- **Standardization**: Zero mean, unit variance
-- **Augmentation**: Add noise for robustness
-- **Shuffle**: Randomize sample order
+1. **Create Your Dataset**:
+   - **Option A**: Upload CSV file with format:
+   ```csv
+   feature1,feature2,label
+   0.5,1.2,0
+   0.7,0.8,1
+   ...
+   ```
+   - **Option B**: Draw interactively on canvas
+   - **Option C**: Generate synthetic patterns
+
+2. **Apply Dataset to Training**:
+   - Click "Use for Training" button
+   - Dataset automatically loads into training pipeline
+   - Check Training tab - you'll see "Custom Dataset Loaded" indicator
+   - Preset datasets become disabled while custom dataset is active
+
+3. **Preprocessing Options**:
+   - **Normalization**: Automatically scales features to [0,1]
+   - **Standardization**: Zero mean, unit variance
+   - **Augmentation**: Add configurable noise for robustness
+   - **Shuffle**: Randomize sample order for better training
+   - **Train/Test Split**: Configure validation data percentage
 
 ## Best Practices
 

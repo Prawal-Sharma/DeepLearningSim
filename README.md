@@ -2,10 +2,20 @@
 
 A comprehensive, interactive educational platform for learning deep learning concepts through hands-on experimentation, real-time visualization, and guided tutorials. Build, train, and understand neural networks directly in your browser!
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/Prawal-Sharma/DeepLearningSim)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/Prawal-Sharma/DeepLearningSim)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.1.1-61dafb.svg)](https://reactjs.org/)
 [![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-4.22.0-ff6f00.svg)](https://www.tensorflow.org/js)
+[![Status](https://img.shields.io/badge/status-Production%20Ready-success.svg)](https://github.com/Prawal-Sharma/DeepLearningSim)
+
+## 🆕 What's New in v3.1.0
+
+- **Full Dataset Integration**: Custom datasets now seamlessly connect to training pipeline
+- **Real Hyperparameter Tuning**: Actual model training instead of simulations
+- **Production Optimizations**: Memory leaks fixed, React components optimized
+- **Error Boundaries**: Graceful error handling throughout the application
+- **Network Validation**: Comprehensive validation with helpful error messages
+- **Performance Boost**: Improved render performance and tensor management
 
 ## 🎯 Overview
 
@@ -42,15 +52,16 @@ The Deep Learning Simulator is an educational tool designed to make deep learnin
 
 ### 🗂️ Dataset Management
 - **Pre-built Datasets**: XOR, Circles, Spirals, Linear, Quadratic patterns
-- **Custom Data Creation**:
-  - Upload CSV files
-  - Draw datasets interactively with mouse
+- **Custom Data Creation**: ✨ **NEW - Fully Integrated**
+  - Upload CSV files and use directly for training
+  - Draw datasets interactively with mouse clicks
   - Generate synthetic patterns (spirals, clusters, moons)
+  - One-click "Use for Training" button
 - **Data Preprocessing**:
-  - Normalization and standardization
-  - Train/test splitting
-  - Data augmentation with noise
-  - Feature shuffling
+  - Automatic normalization and standardization
+  - Configurable train/test splitting
+  - Data augmentation with adjustable noise
+  - Feature shuffling for better training
 
 ### 💾 Model Management
 - **Save & Load Models**: Persist trained models in browser storage
@@ -61,11 +72,13 @@ The Deep Learning Simulator is an educational tool designed to make deep learnin
 - **Version History**: Track model performance over time
 
 ### 🔧 Hyperparameter Optimization
+- **Real Model Training**: ✨ **NEW - Actually trains models, not simulated**
 - **Grid Search**: Exhaustive search through parameter combinations
 - **Random Search**: Efficient exploration of hyperparameter space
 - **Sensitivity Analysis**: Visualize impact of each parameter
 - **Auto-Tuning**: Intelligent preset combinations for quick optimization
 - **Visual Results**: Interactive charts showing optimization progress
+- **Cancellation Support**: Stop long-running searches anytime
 
 ### 🎓 Educational Components
 - **Interactive Tutorials**:
@@ -123,17 +136,17 @@ npm run preview
 
 ## 🛠️ Technology Stack
 
-| Technology | Purpose |
-|------------|---------|
-| **React 19** | UI framework with hooks and modern patterns |
-| **TypeScript** | Type safety and better developer experience |
-| **TensorFlow.js** | Neural network computations in the browser |
-| **D3.js** | Advanced data visualizations and network graphs |
-| **Vite** | Lightning-fast build tool and dev server |
-| **Tailwind CSS** | Utility-first styling framework |
-| **Zustand** | Lightweight state management |
-| **Framer Motion** | Smooth animations and transitions |
-| **Recharts** | Beautiful charts for training metrics |
+| Technology | Purpose | Status |
+|------------|---------|---------|
+| **React 19** | UI framework with hooks and modern patterns | ✅ Optimized with React.memo |
+| **TypeScript** | Type safety and better developer experience | ✅ Zero errors |
+| **TensorFlow.js** | Neural network computations in the browser | ✅ Memory leaks fixed |
+| **D3.js** | Advanced data visualizations and network graphs | ✅ Production ready |
+| **Vite** | Lightning-fast build tool and dev server | ✅ Optimized build |
+| **Tailwind CSS** | Utility-first styling framework | ✅ Consistent styling |
+| **Zustand** | Lightweight state management | ✅ Custom dataset support |
+| **Framer Motion** | Smooth animations and transitions | ✅ Performance optimized |
+| **Recharts** | Beautiful charts for training metrics | ✅ Real-time updates |
 
 ## 📖 User Guide
 
