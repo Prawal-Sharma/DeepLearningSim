@@ -72,8 +72,7 @@ export const ModelManager: React.FC = () => {
       setModelName('');
     } catch (error) {
       showToast('Failed to save model', 'error');
-      console.error('Save error:', error);
-    }
+          }
   };
 
   const loadModel = async (model: SavedModel) => {
@@ -94,8 +93,7 @@ export const ModelManager: React.FC = () => {
       setSelectedModel(model);
     } catch (error) {
       showToast('Failed to load model', 'error');
-      console.error('Load error:', error);
-    }
+          }
   };
 
   const deleteModel = async (model: SavedModel) => {
@@ -115,8 +113,7 @@ export const ModelManager: React.FC = () => {
       showToast(`Model "${model.name}" deleted`, 'info');
     } catch (error) {
       showToast('Failed to delete model', 'error');
-      console.error('Delete error:', error);
-    }
+          }
   };
 
   const exportModel = async (format: 'json' | 'tfjs') => {
@@ -167,8 +164,7 @@ export const ModelManager: React.FC = () => {
       }
     } catch (error) {
       showToast('Failed to export model', 'error');
-      console.error('Export error:', error);
-    }
+          }
   };
 
   const importModel = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,8 +185,7 @@ export const ModelManager: React.FC = () => {
       showToast('Model import functionality in development', 'info');
     } catch (error) {
       showToast('Failed to import model', 'error');
-      console.error('Import error:', error);
-    }
+          }
   };
 
   const toggleCompareModel = (model: SavedModel) => {

@@ -16,6 +16,7 @@ export const TrainingPanel: React.FC = () => {
     currentEpoch,
     loss,
     accuracy,
+    customDataset,
   } = useStore();
 
   const [selectedDataset, setSelectedDataset] = useState(0);
@@ -30,9 +31,12 @@ export const TrainingPanel: React.FC = () => {
       return;
     }
 
-    const dataset = datasets[selectedDataset];
+    // Use custom dataset if available, otherwise use selected preset
+    const dataset = customDataset || datasets[selectedDataset];
+    const datasetName = customDataset ? customDataset.name : datasets[selectedDataset].name;
+    
     startTraining();
-    showToast(`Starting training on ${dataset.name} dataset`, 'info');
+    showToast(`Starting training on ${datasetName} dataset`, 'info');
 
     try {
       const xTrain = tf.tensor2d(dataset.data.inputs);
@@ -57,7 +61,6 @@ export const TrainingPanel: React.FC = () => {
       yTrain.dispose();
       showToast('Training completed successfully!', 'success');
     } catch (error) {
-      console.error('Training error:', error);
       showToast('Training failed. Please check your network configuration.', 'error');
       stopTraining();
     }
@@ -77,11 +80,23 @@ export const TrainingPanel: React.FC = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Dataset
           </label>
+          {customDataset && (
+            <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-md">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-green-700">
+                  ✓ Custom Dataset Loaded: {customDataset.name}
+                </span>
+                <span className="text-xs text-green-600">
+                  {customDataset.data.inputs.length} samples
+                </span>
+              </div>
+            </div>
+          )}
           <select
             value={selectedDataset}
             onChange={(e) => setSelectedDataset(parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isTraining}
+            disabled={isTraining || !!customDataset}
           >
             {datasets.map((dataset, index) => (
               <option key={index} value={index}>
@@ -89,6 +104,11 @@ export const TrainingPanel: React.FC = () => {
               </option>
             ))}
           </select>
+          {customDataset && (
+            <p className="mt-1 text-xs text-gray-500">
+              Preset datasets disabled while custom dataset is active. Clear from Data tab to use presets.
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-4">

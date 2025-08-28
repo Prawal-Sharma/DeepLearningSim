@@ -343,8 +343,8 @@ function App() {
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DatasetManager onDatasetSelect={(dataset) => {
-                console.log('Dataset selected:', dataset);
-                // TODO: Update store with selected dataset
+                // Dataset is now automatically saved to store when "Use for Training" is clicked
+                // This callback is kept for backward compatibility
               }} />
               <div className="space-y-4">
                 <NetworkVisualizer />

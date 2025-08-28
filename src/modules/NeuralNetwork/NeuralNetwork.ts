@@ -40,8 +40,52 @@ export class NeuralNetwork {
   private isTraining: boolean = false;
 
   constructor(config: NetworkConfig) {
+    this.validateConfig(config);
     this.config = config;
     this.buildModel();
+  }
+
+  private validateConfig(config: NetworkConfig): void {
+    if (!config.layers || config.layers.length === 0) {
+      throw new Error('Network must have at least one layer');
+    }
+
+    // Validate each layer
+    config.layers.forEach((layer, index) => {
+      if (layer.type === 'dense' || !layer.type) {
+        if (!layer.units || layer.units < 1 || layer.units > 1024) {
+          throw new Error(`Layer ${index}: Dense layer units must be between 1 and 1024`);
+        }
+      }
+      
+      if (layer.type === 'dropout' && (!layer.rate || layer.rate < 0 || layer.rate >= 1)) {
+        throw new Error(`Layer ${index}: Dropout rate must be between 0 and 1`);
+      }
+      
+      if (layer.type === 'conv2d') {
+        if (!layer.filters || layer.filters < 1 || layer.filters > 512) {
+          throw new Error(`Layer ${index}: Conv2D filters must be between 1 and 512`);
+        }
+        if (!layer.kernelSize || layer.kernelSize < 1 || layer.kernelSize > 11) {
+          throw new Error(`Layer ${index}: Conv2D kernel size must be between 1 and 11`);
+        }
+      }
+      
+      // Check first layer has input shape
+      if (index === 0 && !layer.inputShape && layer.type !== 'dropout') {
+        throw new Error('First layer must specify input shape');
+      }
+    });
+
+    // Validate learning rate
+    if (config.learningRate && (config.learningRate <= 0 || config.learningRate > 1)) {
+      throw new Error('Learning rate must be between 0 and 1');
+    }
+
+    // Validate batch size
+    if (config.batchSize && (config.batchSize < 1 || config.batchSize > 512)) {
+      throw new Error('Batch size must be between 1 and 512');
+    }
   }
 
   private buildModel(): void {

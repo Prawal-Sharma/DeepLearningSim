@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import * as d3 from 'd3';
 import { useToast } from '../Toast/ToastProvider';
+import { useStore } from '../../store/useStore';
 
 interface DataPoint {
   x: number;
@@ -30,6 +31,7 @@ export const DatasetManager: React.FC<DatasetManagerProps> = ({ onDatasetSelect 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const { showToast } = useToast();
+  const { setCustomDataset } = useStore();
 
   // Preprocessing options
   const [normalizeData, setNormalizeData] = useState(true);
@@ -65,7 +67,6 @@ export const DatasetManager: React.FC<DatasetManagerProps> = ({ onDatasetSelect 
       showToast(`Loaded ${data.length} data points from CSV`, 'success');
     } catch (error) {
       showToast('Failed to parse CSV file', 'error');
-      console.error('CSV parse error:', error);
     }
   };
 
@@ -225,6 +226,83 @@ export const DatasetManager: React.FC<DatasetManagerProps> = ({ onDatasetSelect 
 
     onDatasetSelect(dataset);
     showToast(`Dataset prepared with ${data.length} points`, 'success');
+  };
+
+  // Convert dataset to training format
+  const useDatasetForTraining = () => {
+    const currentData = uploadedData.length > 0 ? uploadedData : drawnData;
+    
+    if (currentData.length === 0) {
+      showToast('No data available. Upload or draw a dataset first.', 'warning');
+      return;
+    }
+
+    // Process and normalize data
+    let processedData = [...currentData];
+    
+    // Shuffle if enabled
+    if (shuffleData) {
+      processedData = processedData.sort(() => Math.random() - 0.5);
+    }
+    
+    // Normalize if enabled
+    let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+    if (normalizeData) {
+      processedData.forEach(point => {
+        xMin = Math.min(xMin, point.x);
+        xMax = Math.max(xMax, point.x);
+        yMin = Math.min(yMin, point.y);
+        yMax = Math.max(yMax, point.y);
+      });
+    }
+    
+    // Convert to input/output format
+    const inputs: number[][] = [];
+    const outputs: number[][] = [];
+    
+    processedData.forEach(point => {
+      let x = point.x;
+      let y = point.y;
+      
+      if (normalizeData) {
+        x = (x - xMin) / (xMax - xMin);
+        y = (y - yMin) / (yMax - yMin);
+      }
+      
+      inputs.push([x, y]);
+      
+      // Create one-hot encoded output for classification
+      const uniqueLabels = [...new Set(processedData.map(p => p.label))].sort();
+      if (uniqueLabels.length > 2) {
+        // Multi-class classification
+        const oneHot = new Array(uniqueLabels.length).fill(0);
+        oneHot[uniqueLabels.indexOf(point.label)] = 1;
+        outputs.push(oneHot);
+      } else {
+        // Binary classification
+        outputs.push([point.label]);
+      }
+    });
+    
+    const dataset = {
+      data: { inputs, outputs },
+      name: 'Custom Dataset',
+      type: 'classification' as const
+    };
+    
+    // Update store with custom dataset
+    setCustomDataset(dataset);
+    
+    // Call the prop function for compatibility
+    onDatasetSelect({
+      name: dataset.name,
+      data: currentData,
+      features: 2,
+      classes: [...new Set(processedData.map(p => p.label))].length,
+      type: dataset.type
+    });
+    
+    showToast(`Dataset with ${processedData.length} samples ready for training!`, 'success');
   };
 
   // Generate synthetic datasets
@@ -541,15 +619,25 @@ export const DatasetManager: React.FC<DatasetManagerProps> = ({ onDatasetSelect 
         </div>
       )}
 
-      {/* Apply Button */}
-      <motion.button
-        whileTap={{ scale: 0.95 }}
-        onClick={processAndSelectDataset}
-        disabled={uploadedData.length === 0 && drawnData.length === 0}
-        className="w-full mt-6 py-3 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
-      >
-        Apply Dataset to Network
-      </motion.button>
+      {/* Apply Buttons */}
+      <div className="flex space-x-2 mt-6">
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={processAndSelectDataset}
+          disabled={uploadedData.length === 0 && drawnData.length === 0}
+          className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+        >
+          Preview Dataset
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={useDatasetForTraining}
+          disabled={uploadedData.length === 0 && drawnData.length === 0}
+          className="flex-1 py-3 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+        >
+          Use for Training
+        </motion.button>
+      </div>
     </div>
   );
 };

@@ -22,7 +22,11 @@ export const NetworkBuilder: React.FC = () => {
   const [advancedMode, setAdvancedMode] = useState(false);
 
   useEffect(() => {
-    setNetwork(networkConfig);
+    try {
+      setNetwork(networkConfig);
+    } catch (error: any) {
+      showToast(`Network configuration error: ${error.message}`, 'error');
+    }
   }, []);
 
   const handleLayerUpdate = (index: number, field: keyof LayerConfig, value: any) => {

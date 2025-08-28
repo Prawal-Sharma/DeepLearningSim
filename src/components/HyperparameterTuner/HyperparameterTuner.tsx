@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import * as d3 from 'd3';
+import * as tf from '@tensorflow/tfjs';
 import { useStore } from '../../store/useStore';
 import { useToast } from '../Toast/ToastProvider';
+import { NeuralNetwork, NetworkConfig } from '../../modules/NeuralNetwork/NeuralNetwork';
+import { datasets } from '../../modules/Datasets/datasets';
 
 interface HyperparameterRange {
   learningRate: { min: number; max: number; step: number };
@@ -39,8 +42,9 @@ export const HyperparameterTuner: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [currentExperiment, setCurrentExperiment] = useState<string>('');
   const sensitivityChartRef = useRef<SVGSVGElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   
-  const { setNetwork } = useStore();
+  const { setNetwork, customDataset, networkConfig } = useStore();
   const { showToast } = useToast();
 
   // Default hyperparameter ranges
@@ -105,42 +109,118 @@ export const HyperparameterTuner: React.FC = () => {
     return combinations;
   };
 
-  // Simulate training with given hyperparameters
-  const simulateTraining = async (params: any): Promise<TuningResult> => {
-    // This is a simulation - in real implementation, you would actually train the model
+  // Train model with given hyperparameters
+  const trainWithParams = async (params: any): Promise<TuningResult> => {
     const startTime = Date.now();
     
-    // Simulate training delay
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Calculate simulated metrics based on hyperparameters
-    const baseScore = 0.5;
-    const lrScore = params.learningRate > 0.01 && params.learningRate < 0.05 ? 0.2 : 0;
-    const bsScore = params.batchSize >= 32 && params.batchSize <= 64 ? 0.1 : 0;
-    const layerScore = params.layers >= 3 && params.layers <= 4 ? 0.15 : 0;
-    const dropoutScore = params.dropout > 0.1 && params.dropout < 0.3 ? 0.05 : 0;
-    
-    const score = baseScore + lrScore + bsScore + layerScore + dropoutScore + (Math.random() * 0.2 - 0.1);
-    const loss = 1 - score + (Math.random() * 0.2 - 0.1);
-    
-    return {
-      id: `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      params,
-      metrics: {
-        loss,
-        accuracy: Math.max(0, Math.min(1, score)),
-        trainingTime: Date.now() - startTime,
-      },
-      score,
-    };
+    try {
+      // Use custom dataset or default to XOR
+      const dataset = customDataset || datasets[0];
+      
+      // Build network configuration
+      const layers = [];
+      for (let i = 0; i < params.layers; i++) {
+        const layer: any = {
+          type: 'dense',
+          units: params.neurons[i],
+          activation: i === params.layers - 1 ? 'sigmoid' : 'relu',
+        };
+        
+        if (i === 0) {
+          layer.inputShape = [dataset.data.inputs[0].length];
+        }
+        
+        // Add dropout after hidden layers if specified
+        if (params.dropout && params.dropout > 0 && i < params.layers - 1) {
+          layers.push(layer);
+          layers.push({
+            type: 'dropout',
+            rate: params.dropout,
+          });
+        } else {
+          layers.push(layer);
+        }
+      }
+      
+      const config: NetworkConfig = {
+        layers,
+        optimizer: networkConfig.optimizer || 'adam',
+        loss: networkConfig.loss || 'binaryCrossentropy',
+        learningRate: params.learningRate,
+        batchSize: params.batchSize,
+      };
+      
+      // Create and train network
+      const network = new NeuralNetwork(config);
+      const xTrain = tf.tensor2d(dataset.data.inputs);
+      const yTrain = tf.tensor2d(dataset.data.outputs);
+      
+      let finalLoss = 0;
+      let finalAccuracy = 0;
+      
+      await network.train(xTrain, yTrain, {
+        epochs: params.epochs,
+        batchSize: params.batchSize,
+        validationSplit: 0.2,
+        callbacks: {
+          onEpochEnd: (epoch, logs) => {
+            finalLoss = logs?.loss as number || 0;
+            finalAccuracy = logs?.acc as number || 0;
+            
+            // Check if training should be aborted
+            if (abortControllerRef.current?.signal.aborted) {
+              network.stopTraining();
+            }
+          },
+        },
+      });
+      
+      // Clean up
+      xTrain.dispose();
+      yTrain.dispose();
+      network.dispose();
+      
+      const score = finalAccuracy - (finalLoss * 0.1); // Simple scoring metric
+      
+      return {
+        id: `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        params,
+        metrics: {
+          loss: finalLoss,
+          accuracy: finalAccuracy,
+          trainingTime: Date.now() - startTime,
+        },
+        score,
+      };
+    } catch (error) {
+      // If training fails, return poor metrics
+      return {
+        id: `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        params,
+        metrics: {
+          loss: 999,
+          accuracy: 0,
+          trainingTime: Date.now() - startTime,
+        },
+        score: 0,
+      };
+    }
   };
 
   // Run hyperparameter tuning
   const runTuning = async () => {
+    if (!customDataset && !datasets.length) {
+      showToast('Please load a dataset first', 'warning');
+      return;
+    }
+    
     setIsRunning(true);
     setResults([]);
     setBestResult(null);
     setProgress(0);
+    
+    // Create abort controller for cancellation
+    abortControllerRef.current = new AbortController();
 
     let combinations: any[] = [];
     
@@ -167,10 +247,16 @@ export const HyperparameterTuner: React.FC = () => {
     const allResults: TuningResult[] = [];
     
     for (let i = 0; i < combinations.length; i++) {
+      // Check if cancelled
+      if (abortControllerRef.current?.signal.aborted) {
+        showToast('Hyperparameter tuning cancelled', 'info');
+        break;
+      }
+      
       setCurrentExperiment(`Testing combination ${i + 1}/${combinations.length}`);
       setProgress((i / combinations.length) * 100);
       
-      const result = await simulateTraining(combinations[i]);
+      const result = await trainWithParams(combinations[i]);
       allResults.push(result);
       setResults([...allResults]);
       
@@ -562,18 +648,32 @@ export const HyperparameterTuner: React.FC = () => {
         </div>
       )}
 
-      {/* Run Button */}
-      <button
-        onClick={runTuning}
-        disabled={isRunning}
-        className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
-          isRunning
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-green-500 text-white hover:bg-green-600'
-        }`}
-      >
-        {isRunning ? 'Running...' : 'Start Tuning'}
-      </button>
+      {/* Run/Stop Buttons */}
+      <div className="flex space-x-2">
+        <button
+          onClick={runTuning}
+          disabled={isRunning}
+          className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors ${
+            isRunning
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-green-500 text-white hover:bg-green-600'
+          }`}
+        >
+          {isRunning ? 'Running...' : 'Start Tuning'}
+        </button>
+        {isRunning && (
+          <button
+            onClick={() => {
+              abortControllerRef.current?.abort();
+              setIsRunning(false);
+              setCurrentExperiment('');
+            }}
+            className="px-4 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 font-medium transition-colors"
+          >
+            Stop
+          </button>
+        )}
+      </div>
 
       {/* Results */}
       {results.length > 0 && (

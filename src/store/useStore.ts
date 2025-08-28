@@ -18,6 +18,11 @@ interface NetworkState {
     accuracy: number[];
     epoch: number;
   };
+  customDataset: {
+    data: { inputs: number[][]; outputs: number[][] };
+    name: string;
+    type: 'classification' | 'regression';
+  } | null;
   
   setNetwork: (config: NetworkConfig) => void;
   loadNetwork: (network: any, layers: LayerConfig[]) => void;
@@ -31,6 +36,7 @@ interface NetworkState {
   setTrainingSpeed: (speed: number) => void;
   updateTrainingMetrics: (metrics: { epoch?: number; loss?: number; accuracy?: number }) => void;
   resetNetwork: () => void;
+  setCustomDataset: (dataset: NetworkState['customDataset']) => void;
 }
 
 const defaultNetworkConfig: NetworkConfig = {
@@ -61,10 +67,16 @@ export const useStore = create<NetworkState>((set, get) => ({
     accuracy: [],
     epoch: 0,
   },
+  customDataset: null,
 
   setNetwork: (config) => {
-    const network = new NeuralNetwork(config);
-    set({ network, networkConfig: config, layers: config.layers });
+    try {
+      const network = new NeuralNetwork(config);
+      set({ network, networkConfig: config, layers: config.layers });
+    } catch (error) {
+      // Re-throw to let components handle the error
+      throw error;
+    }
   },
 
   loadNetwork: (network, layers) => {
@@ -166,5 +178,9 @@ export const useStore = create<NetworkState>((set, get) => ({
       loss: 0,
       accuracy: 0,
     });
+  },
+
+  setCustomDataset: (dataset) => {
+    set({ customDataset: dataset });
   },
 }));
