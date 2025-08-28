@@ -163,7 +163,7 @@ export const HyperparameterTuner: React.FC = () => {
         batchSize: params.batchSize,
         validationSplit: 0.2,
         callbacks: {
-          onEpochEnd: (epoch, logs) => {
+          onEpochEnd: (_epoch, logs) => {
             finalLoss = logs?.loss as number || 0;
             finalAccuracy = logs?.acc as number || 0;
             

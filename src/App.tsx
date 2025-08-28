@@ -342,7 +342,7 @@ function App() {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DatasetManager onDatasetSelect={(dataset) => {
+              <DatasetManager onDatasetSelect={() => {
                 // Dataset is now automatically saved to store when "Use for Training" is clicked
                 // This callback is kept for backward compatibility
               }} />

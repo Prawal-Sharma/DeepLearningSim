@@ -11,7 +11,7 @@ interface DatasetVisualizerProps {
   interactive?: boolean;
 }
 
-export const DatasetVisualizer: React.FC<DatasetVisualizerProps> = ({
+const DatasetVisualizerComponent: React.FC<DatasetVisualizerProps> = ({
   datasetIndex,
   showDecisionBoundary = false,
   interactive = false
@@ -339,3 +339,5 @@ export const DatasetVisualizer: React.FC<DatasetVisualizerProps> = ({
     </motion.div>
   );
 };
+
+export const DatasetVisualizer = React.memo(DatasetVisualizerComponent);

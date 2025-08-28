@@ -19,7 +19,7 @@ interface Connection {
   weight: number;
 }
 
-export const NetworkVisualizer: React.FC = () => {
+const NetworkVisualizerComponent: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const { networkConfig, isTraining } = useStore();
   const [hoveredNeuron, setHoveredNeuron] = useState<Neuron | null>(null);
@@ -211,3 +211,5 @@ export const NetworkVisualizer: React.FC = () => {
     </div>
   );
 };
+
+export const NetworkVisualizer = React.memo(NetworkVisualizerComponent);

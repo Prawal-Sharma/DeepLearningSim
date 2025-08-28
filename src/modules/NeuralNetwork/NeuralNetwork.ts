@@ -66,8 +66,19 @@ export class NeuralNetwork {
         if (!layer.filters || layer.filters < 1 || layer.filters > 512) {
           throw new Error(`Layer ${index}: Conv2D filters must be between 1 and 512`);
         }
-        if (!layer.kernelSize || layer.kernelSize < 1 || layer.kernelSize > 11) {
-          throw new Error(`Layer ${index}: Conv2D kernel size must be between 1 and 11`);
+        const kernelSize = layer.kernelSize;
+        if (!kernelSize) {
+          throw new Error(`Layer ${index}: Conv2D must specify kernel size`);
+        }
+        // Check if kernelSize is a number or array
+        if (typeof kernelSize === 'number') {
+          if (kernelSize < 1 || kernelSize > 11) {
+            throw new Error(`Layer ${index}: Conv2D kernel size must be between 1 and 11`);
+          }
+        } else if (Array.isArray(kernelSize)) {
+          if (kernelSize.some(k => k < 1 || k > 11)) {
+            throw new Error(`Layer ${index}: Conv2D kernel size values must be between 1 and 11`);
+          }
         }
       }
       
@@ -282,19 +293,19 @@ export class NeuralNetwork {
       throw new Error('Model not initialized');
     }
 
-    const x = input instanceof tf.Tensor ? input : tf.tensor2d(input);
-    const outputs: tf.Tensor[] = [];
+    return tf.tidy(() => {
+      const x = input instanceof tf.Tensor ? input : tf.tensor2d(input);
+      const outputs: tf.Tensor[] = [];
 
-    let currentInput = x;
-    for (const layer of this.model.layers) {
-      const output = layer.apply(currentInput) as tf.Tensor;
-      outputs.push(output);
-      currentInput = output;
-    }
+      let currentInput = x;
+      for (const layer of this.model!.layers) {
+        const output = layer.apply(currentInput) as tf.Tensor;
+        outputs.push(output.clone()); // Clone to keep reference
+        currentInput = output;
+      }
 
-    if (!(input instanceof tf.Tensor)) x.dispose();
-
-    return outputs;
+      return outputs;
+    });
   }
 
   stopTraining(): void {
